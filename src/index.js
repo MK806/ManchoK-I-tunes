@@ -1,17 +1,33 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import Header from './Header';
+import ItemsList from './ItemsList';
+import { itunesApiRequest, mediaTypes } from './utils';
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+class App extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = { searchResults: [] };
+		this.updateSearch = this.updateSearch.bind(this);
+	}
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+	async updateSearch(text, media) {
+		const response = await itunesApiRequest(text, media);
+		this.setState({ searchResults: response.results });
+	}
+
+	render() {
+		const { searchResults } = this.state;
+		return (
+			<>
+				<div>
+					<Header mediaTypes={mediaTypes} startSearch={this.updateSearch} />
+					<ItemsList items={searchResults} />
+				</div>
+			</>
+		);
+	}
+}
+
+
+ReactDOM.render(<App/>, document.getElementById('root'));
